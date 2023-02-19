@@ -12,46 +12,46 @@ fn main() -> ExitCode {
         return ExitCode::from(1);
     }
 
-    let configFileName = &args[1];
-    let participantName = &args[2];
+    let config_file_name = &args[1];
+    let participant_name = &args[2];
 
-    println!("DUMMY: Running solver dummy with preCICE config file \"{}\" and participant name \"{}\".\n", configFileName, participantName);
+    println!("DUMMY: Running solver dummy with preCICE config file \"{}\" and participant name \"{}\".\n", config_file_name, participant_name);
 
-    let mut interface = precice::new(participantName, configFileName, 0, 1);
+    let mut interface = precice::new(participant_name, config_file_name, 0, 1);
 
-    assert!(participantName == "SolverOne" || participantName == "SolverTwo");
+    assert!(participant_name == "SolverOne" || participant_name == "SolverTwo");
 
-    let (meshName, readDataName, writeDataName) = if participantName == "SolverOne" {
+    let (mesh_name, read_data_name, write_data_name) = if participant_name == "SolverOne" {
         ("MeshOne", "dataTwo", "dataOne")
     } else {
         ("MeshTwo", "dataOne", "dataTwo")
     };
 
-    let meshID = interface.get_mesh_id(meshName);
-    let writeDataID = interface.get_data_id(writeDataName, meshID);
-    let readDataID = interface.get_data_id(readDataName, meshID);
-    const numberOfVertices: usize = 3;
+    let mesh_id = interface.get_mesh_id(mesh_name);
+    let write_data_id = interface.get_data_id(write_data_name, mesh_id);
+    let read_data_id = interface.get_data_id(read_data_name, mesh_id);
+    const NUMBER_OF_VERTICES: usize = 3;
 
     let dimensions = interface.get_dimensions() as usize;
-    let mut vertices = vec![0_f64; numberOfVertices * dimensions];
-    let mut readData = vec![0_f64; numberOfVertices * dimensions];
-    let mut writeData = vec![0_f64; numberOfVertices * dimensions];
+    let mut vertices = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
+    let mut read_data = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
+    let mut write_data = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
 
-    for i in 0..numberOfVertices {
+    for i in 0..NUMBER_OF_VERTICES {
         let f = i as f64;
         for j in 0..(dimensions as usize) {
             let idx = j + dimensions * i;
             vertices[idx] = f;
-            readData[idx] = f;
-            writeData[idx] = f;
+            read_data[idx] = f;
+            write_data[idx] = f;
         }
     }
 
-    let vertexIDs = {
-        let mut vids = vec![0_i32; numberOfVertices];
+    let vertex_ids = {
+        let mut vids = vec![0_i32; NUMBER_OF_VERTICES];
         interface
             .pin_mut()
-            .set_mesh_vertices(meshID, &vertices, &mut vids);
+            .set_mesh_vertices(mesh_id, &vertices, &mut vids);
         vids
     };
 
@@ -74,13 +74,13 @@ fn main() -> ExitCode {
                 .mark_action_fulfilled(&precice::action_write_iteration_checkpoint());
         }
 
-        interface.read_block_vector_data(readDataID, &vertexIDs, &mut readData);
+        interface.read_block_vector_data(read_data_id, &vertex_ids, &mut read_data);
 
-        writeData = readData.iter().map(|x| x + 1_f64).collect();
+        write_data = read_data.iter().map(|x| x + 1_f64).collect();
 
         interface
             .pin_mut()
-            .write_block_vector_data(writeDataID, &vertexIDs, &writeData);
+            .write_block_vector_data(write_data_id, &vertex_ids, &write_data);
 
         dt = interface.pin_mut().advance(dt);
 
