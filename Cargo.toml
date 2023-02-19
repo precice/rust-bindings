@@ -14,3 +14,6 @@ cxx-build = "1.0"
 pkg-config = "0.3"
 semver = "1"
 clap = "2.9"
+
+[[example]]
+name = "solverdummy"
