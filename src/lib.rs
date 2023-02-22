@@ -195,10 +195,8 @@ mod ffi {
     }
 }
 
+// Publish the bindings
+pub use ffi::*;
+
 // Publish a rust-like new function
 pub use ffi::create_solverinterface as new;
-
-// Publish the action names
-pub use ffi::action_read_iteration_checkpoint;
-pub use ffi::action_write_initial_data;
-pub use ffi::action_write_iteration_checkpoint;
