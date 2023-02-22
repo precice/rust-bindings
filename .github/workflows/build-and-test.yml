@@ -1,0 +1,50 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  build:
+    name: ${{ format('{0} {1}', matrix.IMAGE, matrix.TYPE) }}
+    runs-on: ubuntu-latest
+    container: 'precice/ci-${{ matrix.IMAGE }}:latest'
+    defaults:
+      run:
+        shell: "bash --login -eo pipefail {0}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - IMAGE: 'ubuntu-2204'
+            TYPE: Debug
+          - IMAGE: 'ubuntu-2204'
+            TYPE: Release
+            CARGOFLAG: --release
+    steps:
+      - name: Update APT
+        run: apt-get -yy update
+      - name: Install Cargo
+        run: apt-get -yy install cargo
+      - name: Install preCICE
+        run: |
+          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_jammy.deb
+          apt-get -yy install ./libprecice.deb
+          rm libprecice.deb
+      - uses: actions/checkout@v3
+      - name: Build bindings
+        run: cargo build $CARGOFLAG 
+      - name: Build solverdummy
+        run: cargo build $CARGOFLAG --example=solverdummy
+      - name: Run solverdummies
+        run: |
+          cargo run $CARGOFLAG --example=solverdummy -- examples/precice-config.xml SolverOne &
+          cargo run $CARGOFLAG --example=solverdummy -- examples/precice-config.xml SolverTwo
