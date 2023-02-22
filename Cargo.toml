@@ -1,10 +1,16 @@
 [package]
 name = "precice"
 version = "2.5.0"
+authors = ["Frédéric Simonis (fsimonis)"]
 edition = "2021"
-publish = false
 description = "Rust bindinds for precice"
+documentation = "https://precice.org/installation-bindings-rust"
+homepage = "https://precice.org"
 license = "LGPLv3"
+repository = "https://github.com/precice/rust-bindings"
+keywords = ["parallel", "bindings", "pyhsics", "multi-physics" , "mpi" ]
+categories = ["science", "simulation","external-ffi-bindings"]
+links = "precice"
 
 [dependencies]
 cxx = "1.0"
