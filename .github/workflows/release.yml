@@ -1,0 +1,31 @@
+name: Release Pipeline
+on:
+  push:
+    tags:
+      - v*.*.*
+
+  workflow_dispatch:
+
+jobs:
+  crates:
+    name: 'Upload to crates.io'
+    runs-on: ubuntu-latest
+    container: 'precice/ci-ubuntu:22.04:latest'
+    steps:
+      - name: Install common dependencies
+        run: |
+          apt-get -yy update
+          apt-get -yy upgrade
+          apt-get -yy install cargo
+      - name: Install preCICE
+        run: |
+          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_jammy.deb
+          apt-get -yy install ./libprecice.deb
+          rm libprecice.deb
+      - uses: actions/checkout@v3
+      - name: Try to build first
+        run: cargo build
+      - name: Publish
+        run: |
+          echo "${CARGO_IO_TOKEN}" | cargo login
+          cargo publish
