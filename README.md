@@ -1,6 +1,6 @@
 # Rust language bindings for the C++ library preCICE
 
-This package provides rust language bindings for the C++ library [preCICE](https://github.com/precice/precice). Note that the first two digits of the version number of the bindings indicate the preCICE version that the bindings support. The last digit represents the version of the bindings. Example: `v2.5.0` and `v2.5.2` of the bindings represent versions `0` and `2` of the bindings that are compatible with preCICE `v2.5.x`.
+This package provides rust language bindings for the C++ library [preCICE](https://github.com/precice/precice). Note that the first two digits of the version number of the bindings indicate the preCICE version that the bindings support. The last digit represents the version of the bindings. Example: `2.5.0` and `2.5.2` of the bindings represent versions `0` and `2` of the bindings that are compatible with preCICE `2.5.x`.
 
 ## User documentation
 
