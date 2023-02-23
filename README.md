@@ -33,7 +33,7 @@ $ cargo add --git https://github.com/precice/rust-bindings.git --rev v2.5.0 prec
 let mut interface = precice::new("SolverOne", "config.xml", 0, 1);
 
 // call const members
-let dims = interface.get_dimenstions();
+let dims = interface.get_dimensions();
 
 // non-const members require the object to be pinned in memory
 let dims = interface.pin_mut().initialize();
