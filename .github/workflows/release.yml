@@ -10,7 +10,7 @@ jobs:
   crates:
     name: 'Upload to crates.io'
     runs-on: ubuntu-latest
-    container: 'precice/ci-ubuntu:22.04:latest'
+    container: 'precice/ci-ubuntu-2204:latest'
     steps:
       - name: Install common dependencies
         run: |
