@@ -29,6 +29,11 @@ jobs:
           - IMAGE: 'ubuntu-2204'
             TYPE: Release
             CARGOFLAG: --release
+          - IMAGE: 'ubuntu-2004'
+            TYPE: Debug
+          - IMAGE: 'ubuntu-2004'
+            TYPE: Release
+            CARGOFLAG: --release
     steps:
       - name: Update APT
         run: apt-get -yy update
@@ -36,7 +41,7 @@ jobs:
         run: apt-get -yy install cargo
       - name: Install preCICE
         run: |
-          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_jammy.deb
+          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_$(lsb_release -sc).deb
           apt-get -yy install ./libprecice.deb
           rm libprecice.deb
       - uses: actions/checkout@v3
