@@ -22,14 +22,11 @@ fn main() -> ExitCode {
     assert!(participant_name == "SolverOne" || participant_name == "SolverTwo");
 
     let (mesh_name, read_data_name, write_data_name) = if participant_name == "SolverOne" {
-        ("MeshOne", "dataTwo", "dataOne")
+        ("SolverOne-Mesh", "Data-Two", "Data-One")
     } else {
-        ("MeshTwo", "dataOne", "dataTwo")
+        ("SolverTwo-Mesh", "Data-One", "Data-Two")
     };
 
-    let mesh_id = interface.get_mesh_id(mesh_name);
-    let write_data_id = interface.get_data_id(write_data_name, mesh_id);
-    let read_data_id = interface.get_data_id(read_data_name, mesh_id);
     const NUMBER_OF_VERTICES: usize = 3;
 
     let dimensions = interface.get_dimensions() as usize;
@@ -48,47 +45,39 @@ fn main() -> ExitCode {
     }
 
     let vertex_ids = {
-        let mut vids = vec![0_i32; NUMBER_OF_VERTICES];
+        let mut i32s = vec![0_i32; NUMBER_OF_VERTICES];
         interface
             .pin_mut()
-            .set_mesh_vertices(mesh_id, &vertices, &mut vids);
-        vids
+            .set_mesh_vertices(mesh_name, &vertices, &mut i32s);
+        i32s
     };
 
     let mut dt = interface.pin_mut().initialize();
 
-    if interface.is_action_required(&precice::action_write_initial_data()) {
+    if interface.pin_mut().requires_initial_data() {
         println!("DUMMY: Writing initial data\n");
-        interface
-            .pin_mut()
-            .mark_action_fulfilled(&precice::action_write_initial_data());
     }
 
-    interface.pin_mut().initialize_data();
-
     while interface.is_coupling_ongoing() {
-        if interface.is_action_required(&precice::action_write_iteration_checkpoint()) {
+        if interface.pin_mut().requires_writing_checkpoint() {
             println!("DUMMY: Writing iteration checkpoint \n");
-            interface
-                .pin_mut()
-                .mark_action_fulfilled(&precice::action_write_iteration_checkpoint());
         }
 
-        interface.read_block_vector_data(read_data_id, &vertex_ids, &mut read_data);
+        interface.read_block_vector_data(mesh_name, read_data_name, &vertex_ids, &mut read_data);
 
         write_data = read_data.iter().map(|x| x + 1_f64).collect();
 
-        interface
-            .pin_mut()
-            .write_block_vector_data(write_data_id, &vertex_ids, &write_data);
+        interface.pin_mut().write_block_vector_data(
+            mesh_name,
+            write_data_name,
+            &vertex_ids,
+            &write_data,
+        );
 
         dt = interface.pin_mut().advance(dt);
 
-        if interface.is_action_required(&precice::action_read_iteration_checkpoint()) {
+        if interface.pin_mut().requires_reading_checkpoint() {
             println!("DUMMY: Reading iteration checkpoint \n");
-            interface
-                .pin_mut()
-                .mark_action_fulfilled(&precice::action_read_iteration_checkpoint());
         } else {
             println!("DUMMY: Advancing in time \n");
         }

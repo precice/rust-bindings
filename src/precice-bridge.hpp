@@ -11,6 +11,8 @@ namespace precice::rust {
 
 using rint = int32_t;
 
+using vid = rint;
+
 class SolverInterface {
 public:
   // Construction
@@ -21,7 +23,6 @@ public:
   // Steering Methods
 
   double advance(double dt);
-  void   initialize_data();
   double initialize();
   void   finalize();
 
@@ -33,64 +34,57 @@ public:
 
   // Action Methods
 
-  void mark_action_fulfilled(::rust::Str action);
-  bool is_action_required(::rust::Str action) const;
+  bool requires_initial_data();
+  bool requires_writing_checkpoint();
+  bool requires_reading_checkpoint();
 
   // Mesh Access
 
   bool has_mesh(::rust::Str mesh_name) const;
-  rint get_mesh_id(::rust::Str mesh_name) const;
-  bool is_mesh_connectivity_required(rint mesh_id) const;
-  rint set_mesh_vertex(rint mesh_id, ::rust::Slice<const double> position);
-  rint get_mesh_vertex_size(rint mesh_id) const;
-  void set_mesh_vertices(rint mesh_id, ::rust::Slice<const double> positions, ::rust::Slice<rint> ids);
-  rint set_mesh_edge(rint mesh_id, int first_vertex_id, int second_vertex_id);
-  void set_mesh_triangle(rint mesh_id, int first_edge_id, int second_edge_id, int third_edge_id);
-  void set_mesh_triangle_with_edges(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id);
-  void set_mesh_quad(rint mesh_id, int first_edge_id, int second_edge_id, int third_edge_id, int fourth_edge_id);
-  void set_mesh_quad_with_edges(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id);
-  void set_mesh_tetrahedron(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id);
+  bool requires_mesh_connectivity_for(::rust::Str mesh_name) const;
+  vid  set_mesh_vertex(::rust::Str mesh_name, ::rust::Slice<const double> position);
+  vid  get_mesh_vertex_size(::rust::Str mesh_name) const;
+  void set_mesh_vertices(::rust::Str mesh_name, ::rust::Slice<const double> positions, ::rust::Slice<vid> ids);
+  void set_mesh_edge(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id);
+  void set_mesh_triangle(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id);
+  void set_mesh_quad(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id);
+  void set_mesh_tetrahedron(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id);
 
   // Data Access
 
-  bool has_data(::rust::Str dataName, rint mesh_id) const;
-  rint get_data_id(::rust::Str dataName, rint mesh_id) const;
-  void write_block_vector_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> values);
-  void write_vector_data(rint data_id, rint value_index, ::rust::Slice<const double> value);
-  void write_block_scalar_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> values);
-  void write_scalar_data(rint data_id, rint value_index, double value);
-  void read_block_vector_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<double> values) const;
-  void read_vector_data(rint data_id, rint value_index, ::rust::Slice<double> value) const;
-  void read_block_scalar_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<double> values) const;
-  void read_scalar_data(rint data_id, rint value_index, double &value) const;
+  bool has_data(::rust::Str dataName, ::rust::Str mesh_name) const;
+  void write_block_vector_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> values);
+  void write_vector_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> value);
+  void write_block_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> values);
+  void write_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double value);
+  void read_block_vector_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<double> values) const;
+  void read_vector_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<double> value) const;
+  void read_block_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<double> values) const;
+  void read_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double &value) const;
 
   // experimental: Direct Access
 
-  void set_mesh_access_region(const rint mesh_id, ::rust::Slice<const double> boundingBox);
-  void get_mesh_vertices_and_ids(const rint mesh_id, ::rust::Slice<rint> ids, ::rust::Slice<double> coordinates) const;
+  void set_mesh_access_region(const ::rust::Str mesh_name, ::rust::Slice<const double> boundingBox);
+  void get_mesh_vertices_and_ids(const ::rust::Str mesh_name, ::rust::Slice<vid> ids, ::rust::Slice<double> coordinates) const;
 
   // experimental: Time Interpolation
 
-  void read_block_vector_data_rt(rint data_id, ::rust::Slice<const rint> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const;
-  void read_vector_data_rt(rint data_id, rint value_index, double relativeReadTime, ::rust::Slice<double> value) const;
-  void read_block_scalar_data_rt(rint data_id, ::rust::Slice<const rint> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const;
-  void read_scalar_data_rt(rint data_id, rint value_index, double relativeReadTime, double &value) const;
+  void read_block_vector_data_rt(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const;
+  void read_vector_data_rt(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double relativeReadTime, ::rust::Slice<double> value) const;
+  void read_block_scalar_data_rt(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const;
+  void read_scalar_data_rt(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double relativeReadTime, double &value) const;
 
   // experimental: Gradient Data
 
-  bool is_gradient_data_required(rint data_id) const;
-  void write_block_vector_gradient_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> gradient_values);
-  void write_scalar_gradient_data(rint data_id, rint value_index, ::rust::Slice<const double> gradient_values);
-  void write_vector_gradient_data(rint data_id, rint value_index, ::rust::Slice<const double> gradient_values);
-  void write_block_scalar_gradient_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> gradient_values);
+  bool requires_gradient_data_for(::rust::Str mesh_name, ::rust::Str data_name) const;
+  void write_block_vector_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> gradient_values);
+  void write_scalar_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> gradient_values);
+  void write_vector_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> gradient_values);
+  void write_block_scalar_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> gradient_values);
 
 private:
   std::unique_ptr<::precice::SolverInterface> interface;
 };
-
-::rust::String action_write_initial_data();
-::rust::String action_write_iteration_checkpoint();
-::rust::String action_read_iteration_checkpoint();
 
 std::unique_ptr<::precice::rust::SolverInterface> create_solverinterface(::rust::Str participant, ::rust::Str config, rint rank, rint size);
 

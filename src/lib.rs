@@ -2,7 +2,6 @@
 mod ffi {
     unsafe extern "C++" {
         include!("precice/src/precice-bridge.hpp");
-
         type SolverInterface;
 
         fn create_solverinterface(
@@ -17,63 +16,51 @@ mod ffi {
         fn finalize(self: Pin<&mut SolverInterface>);
         fn advance(self: Pin<&mut SolverInterface>, dt: f64) -> f64;
         fn initialize(self: Pin<&mut SolverInterface>) -> f64;
-        fn initialize_data(self: Pin<&mut SolverInterface>);
 
         // Status Queries
 
-        fn get_dimensions(&self) -> i32;
-        fn is_coupling_ongoing(&self) -> bool;
-        fn is_time_window_complete(&self) -> bool;
+        fn get_dimensions(self: &SolverInterface) -> i32;
+        fn is_coupling_ongoing(self: &SolverInterface) -> bool;
+        fn is_time_window_complete(self: &SolverInterface) -> bool;
 
         // Action Methods
 
-        fn mark_action_fulfilled(self: Pin<&mut SolverInterface>, action: &str);
-        fn is_action_required(&self, action: &str) -> bool;
+        fn requires_initial_data(self: Pin<&mut SolverInterface>) -> bool;
+        fn requires_reading_checkpoint(self: Pin<&mut SolverInterface>) -> bool;
+        fn requires_writing_checkpoint(self: Pin<&mut SolverInterface>) -> bool;
 
         // Mesh Access
 
-        fn has_mesh(&self, mesh_name: &str) -> bool;
-        fn get_mesh_id(&self, mesh_name: &str) -> i32;
-        fn is_mesh_connectivity_required(&self, mesh_id: i32) -> bool;
-        fn set_mesh_vertex(self: Pin<&mut SolverInterface>, mesh_id: i32, position: &[f64]) -> i32;
-        fn get_mesh_vertex_size(&self, mesh_id: i32) -> i32;
+        fn has_mesh(self: &SolverInterface, mesh_name: &str) -> bool;
+        fn requires_mesh_connectivity_for(self: &SolverInterface, mesh_name: &str) -> bool;
+        fn set_mesh_vertex(
+            self: Pin<&mut SolverInterface>,
+            mesh_name: &str,
+            position: &[f64],
+        ) -> i32;
+        fn get_mesh_vertex_size(self: &SolverInterface, mesh_name: &str) -> i32;
         fn set_mesh_vertices(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             positions: &[f64],
             ids: &mut [i32],
         );
         fn set_mesh_edge(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             first_vertex_id: i32,
             second_vertex_id: i32,
-        ) -> i32;
+        );
         fn set_mesh_triangle(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
-            first_edge_id: i32,
-            second_edge_id: i32,
-            third_edge_id: i32,
-        );
-        fn set_mesh_triangle_with_edges(
-            self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             first_vertex_id: i32,
             second_vertex_id: i32,
             third_vertex_id: i32,
         );
         fn set_mesh_quad(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
-            first_edge_id: i32,
-            second_edge_id: i32,
-            third_edge_id: i32,
-            fourth_edge_id: i32,
-        );
-        fn set_mesh_quad_with_edges(
-            self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             first_vertex_id: i32,
             second_vertex_id: i32,
             third_vertex_id: i32,
@@ -81,7 +68,7 @@ mod ffi {
         );
         fn set_mesh_tetrahedron(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             first_vertex_id: i32,
             second_vertex_id: i32,
             third_vertex_id: i32,
@@ -90,72 +77,108 @@ mod ffi {
 
         // Data Access
 
-        fn has_data(&self, dataName: &str, mesh_id: i32) -> bool;
-        fn get_data_id(&self, dataName: &str, mesh_id: i32) -> i32;
+        fn has_data(self: &SolverInterface, dataName: &str, mesh_name: &str) -> bool;
         fn write_block_vector_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             values: &[f64],
         );
         fn write_vector_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             value: &[f64],
         );
         fn write_block_scalar_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             values: &[f64],
         );
         fn write_scalar_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             value: f64,
         );
-        fn read_block_vector_data(&self, data_id: i32, valueIndices: &[i32], values: &mut [f64]);
-        fn read_vector_data(&self, data_id: i32, value_index: i32, value: &mut [f64]);
-        fn read_block_scalar_data(&self, data_id: i32, valueIndices: &[i32], values: &mut [f64]);
-        fn read_scalar_data(&self, data_id: i32, value_index: i32, value: &mut f64);
+        fn read_block_vector_data(
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
+            valueIndices: &[i32],
+            values: &mut [f64],
+        );
+        fn read_vector_data(
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
+            value_index: i32,
+            value: &mut [f64],
+        );
+        fn read_block_scalar_data(
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
+            valueIndices: &[i32],
+            values: &mut [f64],
+        );
+        fn read_scalar_data(
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
+            value_index: i32,
+            value: &mut f64,
+        );
 
         // experimental: Direct Access
 
         fn set_mesh_access_region(
             self: Pin<&mut SolverInterface>,
-            mesh_id: i32,
+            mesh_name: &str,
             boundingBox: &[f64],
         );
-        fn get_mesh_vertices_and_ids(&self, mesh_id: i32, ids: &mut [i32], coordinates: &mut [f64]);
+        fn get_mesh_vertices_and_ids(
+            self: &SolverInterface,
+            mesh_name: &str,
+            ids: &mut [i32],
+            coordinates: &mut [f64],
+        );
 
         // experimental: Time Interpolation
 
         fn read_block_vector_data_rt(
-            &self,
-            data_id: i32,
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             relativeReadTime: f64,
             values: &mut [f64],
         );
         fn read_vector_data_rt(
-            &self,
-            data_id: i32,
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             relativeReadTime: f64,
             value: &mut [f64],
         );
         fn read_block_scalar_data_rt(
-            &self,
-            data_id: i32,
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             relativeReadTime: f64,
             values: &mut [f64],
         );
         fn read_scalar_data_rt(
-            &self,
-            data_id: i32,
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             relativeReadTime: f64,
             value: &mut f64,
@@ -163,35 +186,39 @@ mod ffi {
 
         // experimental: Gradient Data
 
-        fn is_gradient_data_required(&self, data_id: i32) -> bool;
+        fn requires_gradient_data_for(
+            self: &SolverInterface,
+            mesh_name: &str,
+            data_name: &str,
+        ) -> bool;
         fn write_block_vector_gradient_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             gradient_values: &[f64],
         );
         fn write_scalar_gradient_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             gradient_values: &[f64],
         );
         fn write_vector_gradient_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             value_index: i32,
             gradient_values: &[f64],
         );
         fn write_block_scalar_gradient_data(
             self: Pin<&mut SolverInterface>,
-            data_id: i32,
+            mesh_name: &str,
+            data_name: &str,
             valueIndices: &[i32],
             gradient_values: &[f64],
         );
-
-        fn action_write_initial_data() -> String;
-        fn action_write_iteration_checkpoint() -> String;
-        fn action_read_iteration_checkpoint() -> String;
     }
 }
 

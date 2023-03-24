@@ -32,10 +32,6 @@ double SolverInterface::initialize()
 {
   return interface->initialize();
 }
-void SolverInterface::initialize_data()
-{
-  interface->initializeData();
-}
 void SolverInterface::finalize()
 {
   interface->finalize();
@@ -57,13 +53,19 @@ bool SolverInterface::is_time_window_complete() const
 
 // Action Methods
 
-void SolverInterface::mark_action_fulfilled(::rust::Str action)
+bool SolverInterface::requires_initial_data()
 {
-  interface->markActionFulfilled(to_string(action));
+  return interface->requiresInitialData();
 }
-bool SolverInterface::is_action_required(::rust::Str action) const
+
+bool SolverInterface::requires_writing_checkpoint()
 {
-  return interface->isActionRequired(to_string(action));
+  return interface->requiresWritingCheckpoint();
+}
+
+bool SolverInterface::requires_reading_checkpoint()
+{
+  return interface->requiresReadingCheckpoint();
 }
 
 // Mesh Access
@@ -72,158 +74,129 @@ bool SolverInterface::has_mesh(::rust::Str mesh_name) const
 {
   return interface->hasMesh(to_string(mesh_name));
 }
-rint SolverInterface::get_mesh_id(::rust::Str name) const
+bool SolverInterface::requires_mesh_connectivity_for(::rust::Str mesh_name) const
 {
-  return interface->getMeshID(to_string(name));
+  return interface->requiresMeshConnectivityFor(to_string(mesh_name));
 }
-bool SolverInterface::is_mesh_connectivity_required(rint mesh_id) const
+vid SolverInterface::set_mesh_vertex(::rust::Str mesh_name, ::rust::Slice<const double> position)
 {
-  return interface->isMeshConnectivityRequired(mesh_id);
+  return interface->setMeshVertex(to_string(mesh_name), position.data());
 }
-rint SolverInterface::set_mesh_vertex(rint mesh_id, ::rust::Slice<const double> position)
+vid SolverInterface::get_mesh_vertex_size(::rust::Str mesh_name) const
 {
-  return interface->setMeshVertex(mesh_id, position.data());
+  return interface->getMeshVertexSize(to_string(mesh_name));
 }
-rint SolverInterface::get_mesh_vertex_size(rint mesh_id) const
+void SolverInterface::set_mesh_vertices(::rust::Str mesh_name, ::rust::Slice<const double> positions, ::rust::Slice<vid> ids)
 {
-  return interface->getMeshVertexSize(mesh_id);
+  interface->setMeshVertices(to_string(mesh_name), positions.size() / interface->getDimensions(), positions.data(), ids.data());
 }
-void SolverInterface::set_mesh_vertices(rint mesh_id, ::rust::Slice<const double> positions, ::rust::Slice<rint> ids)
+void SolverInterface::set_mesh_edge(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id)
 {
-  interface->setMeshVertices(mesh_id, positions.size() / interface->getDimensions(), positions.data(), ids.data());
+  return interface->setMeshEdge(to_string(mesh_name), first_vertex_id, second_vertex_id);
 }
-rint SolverInterface::set_mesh_edge(rint mesh_id, int first_vertex_id, int second_vertex_id)
+void SolverInterface::set_mesh_triangle(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id)
 {
-  return interface->setMeshEdge(mesh_id, first_vertex_id, second_vertex_id);
+  interface->setMeshTriangle(to_string(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id);
 }
-void SolverInterface::set_mesh_triangle(rint mesh_id, int first_edge_id, int second_edge_id, int third_edge_id)
+void SolverInterface::set_mesh_quad(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
 {
-  interface->setMeshTriangle(mesh_id, first_edge_id, second_edge_id, third_edge_id);
+  interface->setMeshQuad(to_string(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
 }
-void SolverInterface::set_mesh_triangle_with_edges(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id)
+void SolverInterface::set_mesh_tetrahedron(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
 {
-  interface->setMeshTriangleWithEdges(mesh_id, first_vertex_id, second_vertex_id, third_vertex_id);
-}
-void SolverInterface::set_mesh_quad(rint mesh_id, int first_edge_id, int second_edge_id, int third_edge_id, int fourth_edge_id)
-{
-  interface->setMeshQuad(mesh_id, first_edge_id, second_edge_id, third_edge_id, fourth_edge_id);
-}
-void SolverInterface::set_mesh_quad_with_edges(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
-{
-  interface->setMeshQuadWithEdges(mesh_id, first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
-}
-void SolverInterface::set_mesh_tetrahedron(rint mesh_id, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
-{
-  interface->setMeshTetrahedron(mesh_id, first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
+  interface->setMeshTetrahedron(to_string(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
 }
 
 // Data Access
 
-bool SolverInterface::has_data(::rust::Str dataName, rint mesh_id) const
+bool SolverInterface::has_data(::rust::Str dataName, ::rust::Str mesh_name) const
 {
-  return interface->hasData(to_string(dataName), mesh_id);
+  return interface->hasData(to_string(dataName), to_string(mesh_name));
 }
-rint SolverInterface::get_data_id(::rust::Str name, rint mesh_id) const
+void SolverInterface::write_block_vector_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> values)
 {
-  return interface->getDataID(to_string(name), mesh_id);
+  interface->writeBlockVectorData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), values.data());
 }
-void SolverInterface::write_block_vector_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> values)
+void SolverInterface::write_vector_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> value)
 {
-  interface->writeBlockVectorData(data_id, valueIndices.size(), valueIndices.data(), values.data());
+  interface->writeVectorData(to_string(mesh_name), to_string(data_name), value_index, value.data());
 }
-void SolverInterface::write_vector_data(rint data_id, rint value_index, ::rust::Slice<const double> value)
+void SolverInterface::write_block_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> values)
 {
-  interface->writeVectorData(data_id, value_index, value.data());
+  interface->writeBlockScalarData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), values.data());
 }
-void SolverInterface::write_block_scalar_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> values)
+void SolverInterface::write_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double value)
 {
-  interface->writeBlockScalarData(data_id, valueIndices.size(), valueIndices.data(), values.data());
+  interface->writeScalarData(to_string(mesh_name), to_string(data_name), value_index, value);
 }
-void SolverInterface::write_scalar_data(rint data_id, rint value_index, double value)
+void SolverInterface::read_block_vector_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<double> values) const
 {
-  interface->writeScalarData(data_id, value_index, value);
+  interface->readBlockVectorData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), values.data());
 }
-void SolverInterface::read_block_vector_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<double> values) const
+void SolverInterface::read_vector_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<double> value) const
 {
-  interface->readBlockVectorData(data_id, valueIndices.size(), valueIndices.data(), values.data());
+  interface->readVectorData(to_string(mesh_name), to_string(data_name), value_index, value.data());
 }
-void SolverInterface::read_vector_data(rint data_id, rint value_index, ::rust::Slice<double> value) const
+void SolverInterface::read_block_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<double> values) const
 {
-  interface->readVectorData(data_id, value_index, value.data());
+  interface->readBlockScalarData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), values.data());
 }
-void SolverInterface::read_block_scalar_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<double> values) const
+void SolverInterface::read_scalar_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double &value) const
 {
-  interface->readBlockScalarData(data_id, valueIndices.size(), valueIndices.data(), values.data());
-}
-void SolverInterface::read_scalar_data(rint data_id, rint value_index, double &value) const
-{
-  interface->readScalarData(data_id, value_index, value);
+  interface->readScalarData(to_string(mesh_name), to_string(data_name), value_index, value);
 }
 
 // experimental: Direct Access
 
-void SolverInterface::set_mesh_access_region(rint mesh_id, ::rust::Slice<const double> boundingBox)
+void SolverInterface::set_mesh_access_region(::rust::Str mesh_name, ::rust::Slice<const double> boundingBox)
 {
-  interface->setMeshAccessRegion(mesh_id, boundingBox.data());
+  interface->setMeshAccessRegion(to_string(mesh_name), boundingBox.data());
 }
-void SolverInterface::get_mesh_vertices_and_ids(rint mesh_id, ::rust::Slice<rint> ids, ::rust::Slice<double> coordinates) const
+void SolverInterface::get_mesh_vertices_and_ids(::rust::Str mesh_name, ::rust::Slice<vid> ids, ::rust::Slice<double> coordinates) const
 {
-  interface->getMeshVerticesAndIDs(mesh_id, ids.size(), ids.data(), coordinates.data());
+  interface->getMeshVerticesAndIDs(to_string(mesh_name), ids.size(), ids.data(), coordinates.data());
 }
 
 // experimental: Time Interpolation
 
-void SolverInterface::read_block_vector_data_rt(rint data_id, ::rust::Slice<const rint> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const
+void SolverInterface::read_block_vector_data_rt(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const
 {
-  interface->readBlockVectorData(data_id, valueIndices.size(), valueIndices.data(), relativeReadTime, values.data());
+  interface->readBlockVectorData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), relativeReadTime, values.data());
 }
-void SolverInterface::read_vector_data_rt(rint data_id, rint value_index, double relativeReadTime, ::rust::Slice<double> value) const
+void SolverInterface::read_vector_data_rt(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double relativeReadTime, ::rust::Slice<double> value) const
 {
-  interface->readVectorData(data_id, value_index, relativeReadTime, value.data());
+  interface->readVectorData(to_string(mesh_name), to_string(data_name), value_index, relativeReadTime, value.data());
 }
-void SolverInterface::read_block_scalar_data_rt(rint data_id, ::rust::Slice<const rint> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const
+void SolverInterface::read_block_scalar_data_rt(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, double relativeReadTime, ::rust::Slice<double> values) const
 {
-  interface->readBlockScalarData(data_id, valueIndices.size(), valueIndices.data(), relativeReadTime, values.data());
+  interface->readBlockScalarData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), relativeReadTime, values.data());
 }
-void SolverInterface::read_scalar_data_rt(rint data_id, rint value_index, double relativeReadTime, double &value) const
+void SolverInterface::read_scalar_data_rt(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, double relativeReadTime, double &value) const
 {
-  interface->readScalarData(data_id, value_index, relativeReadTime, value);
+  interface->readScalarData(to_string(mesh_name), to_string(data_name), value_index, relativeReadTime, value);
 }
 
 // experimental: Gradient Data
 
-bool SolverInterface::is_gradient_data_required(rint data_id) const
+bool SolverInterface::requires_gradient_data_for(::rust::Str mesh_name, ::rust::Str data_name) const
 {
-  return interface->isGradientDataRequired(data_id);
+  return interface->requiresGradientDataFor(to_string(mesh_name), to_string(data_name));
 }
-void SolverInterface::write_block_vector_gradient_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> gradient_values)
+void SolverInterface::write_block_vector_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> gradient_values)
 {
-  interface->writeBlockVectorGradientData(data_id, valueIndices.size(), valueIndices.data(), gradient_values.data());
+  interface->writeBlockVectorGradientData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), gradient_values.data());
 }
-void SolverInterface::write_scalar_gradient_data(rint data_id, rint value_index, ::rust::Slice<const double> gradient_values)
+void SolverInterface::write_scalar_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> gradient_values)
 {
-  interface->writeScalarGradientData(data_id, value_index, gradient_values.data());
+  interface->writeScalarGradientData(to_string(mesh_name), to_string(data_name), value_index, gradient_values.data());
 }
-void SolverInterface::write_vector_gradient_data(rint data_id, rint value_index, ::rust::Slice<const double> gradient_values)
+void SolverInterface::write_vector_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, vid value_index, ::rust::Slice<const double> gradient_values)
 {
-  interface->writeVectorGradientData(data_id, value_index, gradient_values.data());
+  interface->writeVectorGradientData(to_string(mesh_name), to_string(data_name), value_index, gradient_values.data());
 }
-void SolverInterface::write_block_scalar_gradient_data(rint data_id, ::rust::Slice<const rint> valueIndices, ::rust::Slice<const double> gradient_values)
+void SolverInterface::write_block_scalar_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> valueIndices, ::rust::Slice<const double> gradient_values)
 {
-  interface->writeBlockScalarGradientData(data_id, valueIndices.size(), valueIndices.data(), gradient_values.data());
-}
-
-::rust::String action_write_initial_data()
-{
-  return ::precice::constants::actionWriteInitialData();
-}
-::rust::String action_write_iteration_checkpoint()
-{
-  return ::precice::constants::actionWriteIterationCheckpoint();
-}
-::rust::String action_read_iteration_checkpoint()
-{
-  return ::precice::constants::actionReadIterationCheckpoint();
+  interface->writeBlockScalarGradientData(to_string(mesh_name), to_string(data_name), valueIndices.size(), valueIndices.data(), gradient_values.data());
 }
 
 std::unique_ptr<::precice::rust::SolverInterface> create_solverinterface(::rust::Str participant, ::rust::Str config, rint rank, rint size)
