@@ -17,7 +17,7 @@ fn main() -> ExitCode {
 
     println!("DUMMY: Running solver dummy with preCICE config file \"{}\" and participant name \"{}\".\n", config_file_name, participant_name);
 
-    let mut interface = precice::new(participant_name, config_file_name, 0, 1);
+    let mut participant = precice::new(participant_name, config_file_name, 0, 1);
 
     assert!(participant_name == "SolverOne" || participant_name == "SolverTwo");
 
@@ -29,10 +29,13 @@ fn main() -> ExitCode {
 
     const NUMBER_OF_VERTICES: usize = 3;
 
-    let dimensions = interface.get_dimensions() as usize;
+    let dimensions = participant.get_mesh_dimensions(mesh_name) as usize;
+    let read_dimensions = participant.get_data_dimensions(mesh_name, read_data_name) as usize;
+    let write_dimensions = participant.get_data_dimensions(mesh_name, write_data_name) as usize;
+
     let mut vertices = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
-    let mut read_data = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
-    let mut write_data = vec![0_f64; NUMBER_OF_VERTICES * dimensions];
+    let mut read_data = vec![0_f64; NUMBER_OF_VERTICES * read_dimensions];
+    let mut write_data = vec![0_f64; NUMBER_OF_VERTICES * write_dimensions];
 
     for i in 0..NUMBER_OF_VERTICES {
         let f = i as f64;
@@ -46,44 +49,42 @@ fn main() -> ExitCode {
 
     let vertex_ids = {
         let mut i32s = vec![0_i32; NUMBER_OF_VERTICES];
-        interface
+        participant
             .pin_mut()
             .set_mesh_vertices(mesh_name, &vertices, &mut i32s);
         i32s
     };
 
-    let mut dt = interface.pin_mut().initialize();
-
-    if interface.pin_mut().requires_initial_data() {
+    if participant.pin_mut().requires_initial_data() {
         println!("DUMMY: Writing initial data\n");
     }
 
-    while interface.is_coupling_ongoing() {
-        if interface.pin_mut().requires_writing_checkpoint() {
+    participant.pin_mut().initialize();
+
+    while participant.is_coupling_ongoing() {
+        if participant.pin_mut().requires_writing_checkpoint() {
             println!("DUMMY: Writing iteration checkpoint \n");
         }
 
-        interface.read_block_vector_data(mesh_name, read_data_name, &vertex_ids, &mut read_data);
+        let dt = participant.get_max_time_step_size();
+        participant.read_data(mesh_name, read_data_name, &vertex_ids, dt, &mut read_data);
 
         write_data = read_data.iter().map(|x| x + 1_f64).collect();
 
-        interface.pin_mut().write_block_vector_data(
-            mesh_name,
-            write_data_name,
-            &vertex_ids,
-            &write_data,
-        );
+        participant
+            .pin_mut()
+            .write_data(mesh_name, write_data_name, &vertex_ids, &write_data);
 
-        dt = interface.pin_mut().advance(dt);
+        participant.pin_mut().advance(dt);
 
-        if interface.pin_mut().requires_reading_checkpoint() {
+        if participant.pin_mut().requires_reading_checkpoint() {
             println!("DUMMY: Reading iteration checkpoint \n");
         } else {
             println!("DUMMY: Advancing in time \n");
         }
     }
 
-    interface.pin_mut().finalize();
+    participant.pin_mut().finalize();
     println!("DUMMY: Closing rust solver dummy... \n");
 
     return ExitCode::SUCCESS;
