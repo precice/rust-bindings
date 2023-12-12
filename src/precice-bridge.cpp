@@ -3,14 +3,6 @@
 #include <cstdlib>
 #include <memory>
 #include <precice/Participant.hpp>
-#include <string_view>
-
-namespace {
-std::string_view to_string_view(::rust::Str str)
-{
-  return {str.data(), str.size()};
-}
-} // namespace
 
 namespace precice::rust {
 
@@ -19,7 +11,7 @@ namespace precice::rust {
 Participant::~Participant() = default;
 
 Participant::Participant(::rust::Str participant, ::rust::Str config, rint rank, rint size)
-    : participant(std::make_unique<::precice::Participant>(to_string_view(participant), to_string_view(config), rank, size))
+    : participant(std::make_unique<::precice::Participant>(participant, config, rank, size))
 {
 }
 
@@ -75,23 +67,23 @@ bool Participant::requires_reading_checkpoint()
 
 bool Participant::requires_mesh_connectivity_for(::rust::Str mesh_name) const
 {
-  return participant->requiresMeshConnectivityFor(to_string_view(mesh_name));
+  return participant->requiresMeshConnectivityFor(mesh_name);
 }
 vid Participant::set_mesh_vertex(::rust::Str mesh_name, ::rust::Slice<const double> position)
 {
-  return participant->setMeshVertex(to_string_view(mesh_name), position);
+  return participant->setMeshVertex(mesh_name, position);
 }
 vid Participant::get_mesh_vertex_size(::rust::Str mesh_name) const
 {
-  return participant->getMeshVertexSize(to_string_view(mesh_name));
+  return participant->getMeshVertexSize(mesh_name);
 }
 void Participant::set_mesh_vertices(::rust::Str mesh_name, ::rust::Slice<const double> positions, ::rust::Slice<vid> ids)
 {
-  participant->setMeshVertices(to_string_view(mesh_name), positions, ids);
+  participant->setMeshVertices(mesh_name, positions, ids);
 }
 void Participant::set_mesh_edge(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id)
 {
-  return participant->setMeshEdge(to_string_view(mesh_name), first_vertex_id, second_vertex_id);
+  return participant->setMeshEdge(mesh_name, first_vertex_id, second_vertex_id);
 }
 void Participant::set_mesh_edges(::rust::Str mesh_name, ::rust::Slice<const vid> vertices)
 {
@@ -99,7 +91,7 @@ void Participant::set_mesh_edges(::rust::Str mesh_name, ::rust::Slice<const vid>
 }
 void Participant::set_mesh_triangle(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id)
 {
-  participant->setMeshTriangle(to_string_view(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id);
+  participant->setMeshTriangle(mesh_name, first_vertex_id, second_vertex_id, third_vertex_id);
 }
 void Participant::set_mesh_triangles(::rust::Str mesh_name, ::rust::Slice<const vid> vertices)
 {
@@ -107,7 +99,7 @@ void Participant::set_mesh_triangles(::rust::Str mesh_name, ::rust::Slice<const 
 }
 void Participant::set_mesh_quad(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
 {
-  participant->setMeshQuad(to_string_view(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
+  participant->setMeshQuad(mesh_name, first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
 }
 void Participant::set_mesh_quads(::rust::Str mesh_name, ::rust::Slice<const vid> vertices)
 {
@@ -115,7 +107,7 @@ void Participant::set_mesh_quads(::rust::Str mesh_name, ::rust::Slice<const vid>
 }
 void Participant::set_mesh_tetrahedron(::rust::Str mesh_name, int first_vertex_id, int second_vertex_id, int third_vertex_id, int fourth_vertex_id)
 {
-  participant->setMeshTetrahedron(to_string_view(mesh_name), first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
+  participant->setMeshTetrahedron(mesh_name, first_vertex_id, second_vertex_id, third_vertex_id, fourth_vertex_id);
 }
 void Participant::set_mesh_tetrahedra(::rust::Str mesh_name, ::rust::Slice<const vid> vertices)
 {
@@ -143,7 +135,7 @@ void Participant::read_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust
 
 void Participant::set_mesh_access_region(::rust::Str mesh_name, ::rust::Slice<const double> boundingBox)
 {
-  participant->setMeshAccessRegion(to_string_view(mesh_name), boundingBox);
+  participant->setMeshAccessRegion(mesh_name, boundingBox);
 }
 void Participant::get_mesh_vertex_ids_and_coordinates(::rust::Str mesh_name, ::rust::Slice<vid> ids, ::rust::Slice<double> coordinates) const
 {
@@ -154,7 +146,7 @@ void Participant::get_mesh_vertex_ids_and_coordinates(::rust::Str mesh_name, ::r
 
 bool Participant::requires_gradient_data_for(::rust::Str mesh_name, ::rust::Str data_name) const
 {
-  return participant->requiresGradientDataFor(to_string_view(mesh_name), to_string_view(data_name));
+  return participant->requiresGradientDataFor(mesh_name, data_name);
 }
 void Participant::write_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> vertices, ::rust::Slice<const double> gradients)
 {
