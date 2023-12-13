@@ -1,3 +1,4 @@
+use precice;
 use std::env;
 use std::process::ExitCode;
 
@@ -17,7 +18,7 @@ fn main() -> ExitCode {
 
     println!("DUMMY: Running solver dummy with preCICE config file \"{}\" and participant name \"{}\".\n", config_file_name, participant_name);
 
-    let mut participant = precice::new(participant_name, config_file_name, 0, 1);
+    let mut participant = precice::Participant::new(participant_name, config_file_name, 0, 1);
 
     assert!(participant_name == "SolverOne" || participant_name == "SolverTwo");
 
@@ -49,20 +50,18 @@ fn main() -> ExitCode {
 
     let vertex_ids = {
         let mut i32s = vec![0_i32; NUMBER_OF_VERTICES];
-        participant
-            .pin_mut()
-            .set_mesh_vertices(mesh_name, &vertices, &mut i32s);
+        participant.set_mesh_vertices(mesh_name, &vertices, &mut i32s);
         i32s
     };
 
-    if participant.pin_mut().requires_initial_data() {
+    if participant.requires_initial_data() {
         println!("DUMMY: Writing initial data\n");
     }
 
-    participant.pin_mut().initialize();
+    participant.initialize();
 
     while participant.is_coupling_ongoing() {
-        if participant.pin_mut().requires_writing_checkpoint() {
+        if participant.requires_writing_checkpoint() {
             println!("DUMMY: Writing iteration checkpoint \n");
         }
 
@@ -71,20 +70,18 @@ fn main() -> ExitCode {
 
         write_data = read_data.iter().map(|x| x + 1_f64).collect();
 
-        participant
-            .pin_mut()
-            .write_data(mesh_name, write_data_name, &vertex_ids, &write_data);
+        participant.write_data(mesh_name, write_data_name, &vertex_ids, &write_data);
 
-        participant.pin_mut().advance(dt);
+        participant.advance(dt);
 
-        if participant.pin_mut().requires_reading_checkpoint() {
+        if participant.requires_reading_checkpoint() {
             println!("DUMMY: Reading iteration checkpoint \n");
         } else {
             println!("DUMMY: Advancing in time \n");
         }
     }
 
-    participant.pin_mut().finalize();
+    participant.finalize();
     println!("DUMMY: Closing rust solver dummy... \n");
 
     return ExitCode::SUCCESS;
