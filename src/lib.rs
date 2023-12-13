@@ -97,7 +97,7 @@ mod ffi {
         fn set_mesh_access_region(
             self: Pin<&mut Participant>,
             mesh_name: &str,
-            boundingBox: &[f64],
+            bounding_box: &[f64],
         );
         fn get_mesh_vertex_ids_and_coordinates(
             self: &Participant,
@@ -282,10 +282,10 @@ impl Participant {
 
     // Direct Access
 
-    pub fn set_mesh_access_region(&mut self, mesh_name: &str, boundingBox: &[f64]) {
+    pub fn set_mesh_access_region(&mut self, mesh_name: &str, bounding_box: &[f64]) {
         self.internal
             .pin_mut()
-            .set_mesh_access_region(mesh_name, boundingBox)
+            .set_mesh_access_region(mesh_name, bounding_box)
     }
     pub fn get_mesh_vertex_ids_and_coordinates(
         &self,
