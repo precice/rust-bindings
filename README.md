@@ -29,18 +29,24 @@ $ cargo add --git https://github.com/precice/rust-bindings.git --rev v2.5.0 prec
 ## Usage
 
 ```rust
+use precice
+
 // create a solver interface
-let mut interface = precice::new("SolverOne", "config.xml", 0, 1);
+let mut participant = precice::Participant::new("Solver", "config.xml", 0, 1);
 
-// call const members
-let dims = interface.get_dimensions();
+// get dimensions of a mesh
+let meshDims = participant.get_mesh_dimensions("Mesh");
+assert!(meshDims == 2);
 
-// non-const members require the object to be pinned in memory
-let dims = interface.pin_mut().initialize();
+// define coordinates
+let coords = Vec::from([1., 1., 2., 2., 3., 3., 4., 4.]);
+let mut vertices = vec![0_i32; 4]
+participant.set_mesh_vertices("Mesh", &coords, &mut vertices);
 
-// action constants are directly part of precice
-precice::action_write_iteration_checkpoint()
+participant.initialize();
 ```
+
+See the solverdummy under `examples/` for more details.
 
 ## Contributors
 
