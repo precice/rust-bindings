@@ -124,6 +124,8 @@ pub struct Participant {
     internal: cxx::UniquePtr<ffi::Participant>,
 }
 
+pub type VertexID = i32;
+
 impl Participant {
     pub fn new(participant: &str, config: &str, rank: i32, size: i32) -> Self {
         Participant {
@@ -172,31 +174,36 @@ impl Participant {
     pub fn requires_mesh_connectivity_for(&self, mesh_name: &str) -> bool {
         self.internal.requires_mesh_connectivity_for(mesh_name)
     }
-    pub fn set_mesh_vertex(&mut self, mesh_name: &str, position: &[f64]) -> i32 {
+    pub fn set_mesh_vertex(&mut self, mesh_name: &str, position: &[f64]) -> VertexID {
         self.internal.pin_mut().set_mesh_vertex(mesh_name, position)
     }
     pub fn get_mesh_vertex_size(&self, mesh_name: &str) -> i32 {
         self.internal.get_mesh_vertex_size(mesh_name)
     }
-    pub fn set_mesh_vertices(&mut self, mesh_name: &str, positions: &[f64], ids: &mut [i32]) {
+    pub fn set_mesh_vertices(&mut self, mesh_name: &str, positions: &[f64], ids: &mut [VertexID]) {
         self.internal
             .pin_mut()
             .set_mesh_vertices(mesh_name, positions, ids)
     }
-    pub fn set_mesh_edge(&mut self, mesh_name: &str, first_vertex_id: i32, second_vertex_id: i32) {
+    pub fn set_mesh_edge(
+        &mut self,
+        mesh_name: &str,
+        first_vertex_id: VertexID,
+        second_vertex_id: VertexID,
+    ) {
         self.internal
             .pin_mut()
             .set_mesh_edge(mesh_name, first_vertex_id, second_vertex_id)
     }
-    pub fn set_mesh_edges(&mut self, mesh_name: &str, vertices: &[i32]) {
+    pub fn set_mesh_edges(&mut self, mesh_name: &str, vertices: &[VertexID]) {
         self.internal.pin_mut().set_mesh_edges(mesh_name, vertices)
     }
     pub fn set_mesh_triangle(
         &mut self,
         mesh_name: &str,
-        first_vertex_id: i32,
-        second_vertex_id: i32,
-        third_vertex_id: i32,
+        first_vertex_id: VertexID,
+        second_vertex_id: VertexID,
+        third_vertex_id: VertexID,
     ) {
         self.internal.pin_mut().set_mesh_triangle(
             mesh_name,
@@ -205,7 +212,7 @@ impl Participant {
             third_vertex_id,
         )
     }
-    pub fn set_mesh_triangles(&mut self, mesh_name: &str, vertices: &[i32]) {
+    pub fn set_mesh_triangles(&mut self, mesh_name: &str, vertices: &[VertexID]) {
         self.internal
             .pin_mut()
             .set_mesh_triangles(mesh_name, vertices)
@@ -213,10 +220,10 @@ impl Participant {
     pub fn set_mesh_quad(
         &mut self,
         mesh_name: &str,
-        first_vertex_id: i32,
-        second_vertex_id: i32,
-        third_vertex_id: i32,
-        fourth_vertex_id: i32,
+        first_vertex_id: VertexID,
+        second_vertex_id: VertexID,
+        third_vertex_id: VertexID,
+        fourth_vertex_id: VertexID,
     ) {
         self.internal.pin_mut().set_mesh_quad(
             mesh_name,
@@ -226,16 +233,16 @@ impl Participant {
             fourth_vertex_id,
         )
     }
-    pub fn set_mesh_quads(&mut self, mesh_name: &str, vertices: &[i32]) {
+    pub fn set_mesh_quads(&mut self, mesh_name: &str, vertices: &[VertexID]) {
         self.internal.pin_mut().set_mesh_quads(mesh_name, vertices)
     }
     pub fn set_mesh_tetrahedron(
         &mut self,
         mesh_name: &str,
-        first_vertex_id: i32,
-        second_vertex_id: i32,
-        third_vertex_id: i32,
-        fourth_vertex_id: i32,
+        first_vertex_id: VertexID,
+        second_vertex_id: VertexID,
+        third_vertex_id: VertexID,
+        fourth_vertex_id: VertexID,
     ) {
         self.internal.pin_mut().set_mesh_tetrahedron(
             mesh_name,
@@ -245,7 +252,7 @@ impl Participant {
             fourth_vertex_id,
         )
     }
-    pub fn set_mesh_tetrahedra(&mut self, mesh_name: &str, vertices: &[i32]) {
+    pub fn set_mesh_tetrahedra(&mut self, mesh_name: &str, vertices: &[VertexID]) {
         self.internal
             .pin_mut()
             .set_mesh_tetrahedra(mesh_name, vertices)
@@ -261,7 +268,7 @@ impl Participant {
         &mut self,
         mesh_name: &str,
         data_name: &str,
-        vertices: &[i32],
+        vertices: &[VertexID],
         values: &[f64],
     ) {
         self.internal
@@ -272,7 +279,7 @@ impl Participant {
         &self,
         mesh_name: &str,
         data_name: &str,
-        vertices: &[i32],
+        vertices: &[VertexID],
         relative_read_dt: f64,
         values: &mut [f64],
     ) {
@@ -290,7 +297,7 @@ impl Participant {
     pub fn get_mesh_vertex_ids_and_coordinates(
         &self,
         mesh_name: &str,
-        ids: &mut [i32],
+        ids: &mut [VertexID],
         coordinates: &mut [f64],
     ) {
         self.internal
@@ -307,7 +314,7 @@ impl Participant {
         &mut self,
         mesh_name: &str,
         data_name: &str,
-        vertices: &[i32],
+        vertices: &[VertexID],
         gradients: &[f64],
     ) {
         self.internal

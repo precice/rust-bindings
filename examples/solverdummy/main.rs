@@ -48,7 +48,7 @@ fn main() -> ExitCode {
         }
     }
 
-    let vertex_ids = {
+    let vertex_ids: Vec<precice::VertexID> = {
         let mut i32s = vec![0_i32; NUMBER_OF_VERTICES];
         participant.set_mesh_vertices(mesh_name, &vertices, &mut i32s);
         i32s
