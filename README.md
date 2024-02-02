@@ -17,13 +17,13 @@ Please refer to [the preCICE documentation](https://www.precice.org/installation
 ## Installing the package from the registry
 
 ```
-$ cargo add precice@2.5
+$ cargo add precice@3
 ```
 
 ## Installing the package from the git repository
 
 ```
-$ cargo add --git https://github.com/precice/rust-bindings.git --rev v2.5.0 precice
+$ cargo add --git https://github.com/precice/rust-bindings.git --rev v3.0.0 precice
 ```
 
 ## Usage
