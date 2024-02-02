@@ -41,7 +41,7 @@ jobs:
         run: apt-get -yy install cargo
       - name: Install preCICE
         run: |
-          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_$(lsb_release -sc).deb
+          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v3.0.0/libprecice3_3.0.0_$(lsb_release -sc).deb
           apt-get -yy install ./libprecice.deb
           rm libprecice.deb
       - uses: actions/checkout@v3

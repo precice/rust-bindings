@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     container: 'precice/ci-ubuntu-2204:latest'
     steps:
+      - name: Get verison from tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          strip_v: true
       - name: Install common dependencies
         run: |
           apt-get -yy update
@@ -19,12 +24,18 @@ jobs:
           apt-get -yy install cargo
       - name: Install preCICE
         run: |
-          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v2.5.0/libprecice2_2.5.0_jammy.deb
+          # 2.5.4 -> 2.5.0 (always picks minor version 0 of precice)
+          export preciceVersion="$( echo '${{ steps.tag.outputs.tag }}' | sed 's/^\([0-9]\+\.[0-9]\+\)\.[0-9]\+/\1.0/' )"
+          # 2.5.0 -> libprecice2_2.5.0_codename.deb
+          export debPackage="$( echo $preciceVersion | sed 's/^\([0-9]\+\)\.\([0-9]\+\.[0-9]\+\)/libprecice\1_\1.\2/' )_$(lsb_release -sc).deb"
+          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v${preciceVersion}/${debPackage}
           apt-get -yy install ./libprecice.deb
           rm libprecice.deb
       - uses: actions/checkout@v3
       - name: Try to build first
-        run: cargo build
+        run: cargo build --release
+      - name: Try to build examples
+        run: cargo build --release --examples
       - name: Publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
