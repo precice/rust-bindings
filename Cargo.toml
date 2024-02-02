@@ -19,7 +19,7 @@ cxx = "1.0"
 cxx-build = "1.0"
 pkg-config = "0.3"
 semver = "1"
-clap = "2.9"
+clap = { version = "4", features = ["cargo"] }
 
 [[example]]
 name = "solverdummy"
