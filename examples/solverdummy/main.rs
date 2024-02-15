@@ -1,4 +1,3 @@
-use precice;
 use std::env;
 use std::process::ExitCode;
 
@@ -84,5 +83,5 @@ fn main() -> ExitCode {
     participant.finalize();
     println!("DUMMY: Closing rust solver dummy... \n");
 
-    return ExitCode::SUCCESS;
+    ExitCode::SUCCESS
 }
