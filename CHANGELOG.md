@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+## 3.0.1
+
+- Fix compatibility with the latest rust 1.73 which ships with Ubuntu 22.04 LTS
+
 ## 3.0.0
 
 - Added rust wrapper to hide required pinning for mutable operations
