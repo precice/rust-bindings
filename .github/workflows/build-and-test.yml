@@ -29,9 +29,9 @@ jobs:
           - IMAGE: 'ubuntu-2204'
             TYPE: Release
             CARGOFLAG: --release
-          - IMAGE: 'ubuntu-2004'
+          - IMAGE: 'ubuntu-2404'
             TYPE: Debug
-          - IMAGE: 'ubuntu-2004'
+          - IMAGE: 'ubuntu-2404'
             TYPE: Release
             CARGOFLAG: --release
     steps:
