@@ -36,7 +36,7 @@ jobs:
             CARGOFLAG: --release
     steps:
       - name: Update APT
-        run: apt-get -yy update
+        run: apt-get -yy update && apt-get -yy upgrade
       - name: Install Cargo
         run: apt-get -yy install cargo
       - name: Install preCICE
