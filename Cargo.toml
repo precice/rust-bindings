@@ -1,6 +1,6 @@
 [package]
 name = "precice"
-version = "3.0.0"
+version = "3.0.1"
 authors = ["Frédéric Simonis (fsimonis)"]
 edition = "2021"
 description = "Rust bindinds for precice"
