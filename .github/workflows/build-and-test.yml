@@ -44,7 +44,7 @@ jobs:
           wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v3.0.0/libprecice3_3.0.0_$(lsb_release -sc).deb
           apt-get -yy install ./libprecice.deb
           rm libprecice.deb
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build bindings
         run: cargo build $CARGOFLAG 
       - name: Build solverdummy
