@@ -16,7 +16,7 @@ jobs:
   build:
     name: ${{ format('{0} {1}', matrix.IMAGE, matrix.TYPE) }}
     runs-on: ubuntu-latest
-    container: 'precice/ci-${{ matrix.IMAGE }}:latest'
+    container: 'precice/${{ matrix.IMAGE }}'
     defaults:
       run:
         shell: "bash --login -eo pipefail {0}"
@@ -24,26 +24,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - IMAGE: 'ubuntu-2204'
+          - IMAGE: 'precice:nightly'
             TYPE: Debug
-          - IMAGE: 'ubuntu-2204'
-            TYPE: Release
-            CARGOFLAG: --release
-          - IMAGE: 'ubuntu-2404'
-            TYPE: Debug
-          - IMAGE: 'ubuntu-2404'
+          - IMAGE: 'precice:nightly'
             TYPE: Release
             CARGOFLAG: --release
     steps:
+      - name: preCICE Version
+        run: precice-tools version
       - name: Update APT
         run: apt-get -yy update && apt-get -yy upgrade
       - name: Install Cargo
         run: apt-get -yy install cargo
-      - name: Install preCICE
-        run: |
-          wget -q -O libprecice.deb https://github.com/precice/precice/releases/download/v3.0.0/libprecice3_3.0.0_$(lsb_release -sc).deb
-          apt-get -yy install ./libprecice.deb
-          rm libprecice.deb
       - uses: actions/checkout@v4
       - name: Build bindings
         run: cargo build $CARGOFLAG 
