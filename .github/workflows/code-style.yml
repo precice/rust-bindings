@@ -16,8 +16,8 @@ jobs:
         run: pip install pre-commit
       - name: Install cargo
         run: |
-          apt-get -yy update
-          apt-get -yy install cargo
+          sudo apt-get -yy update
+          sudo apt-get -yy install cargo
       - name: Run checks
         run: pre-commit run -a -v
       - name: Git status
