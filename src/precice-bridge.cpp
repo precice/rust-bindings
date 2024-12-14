@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 #include <memory>
-#include <precice/Participant.hpp>
+#include <precice/precice.hpp>
 
 namespace precice::rust {
 
