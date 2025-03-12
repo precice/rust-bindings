@@ -113,6 +113,15 @@ mod ffi {
             values: &mut [f64],
         ) -> Result<()>;
 
+        // User profiling
+
+        pub fn start_profiling_section(
+            self: Pin<&mut Participant>,
+            section_name: &str,
+        ) -> Result<()>;
+
+        pub fn stop_last_profiling_section(self: Pin<&mut Participant>) -> Result<()>;
+
         // Direct Access
 
         fn set_mesh_access_region(
@@ -327,6 +336,18 @@ impl Participant {
     ) -> Result<(), Error> {
         self.internal
             .read_data(mesh_name, data_name, vertices, relative_read_dt, values)
+    }
+
+    // User Profiling
+
+    pub fn start_profiling_section(&mut self, section_name: &str) -> Result<(), Error> {
+        self.internal
+            .pin_mut()
+            .start_profiling_section(section_name)
+    }
+
+    pub fn stop_last_profiling_section(&mut self) -> Result<(), Error> {
+        self.internal.pin_mut().stop_last_profiling_section()
     }
 
     // Direct Access

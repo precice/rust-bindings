@@ -131,6 +131,18 @@ void Participant::read_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust
   participant->readData(mesh_name, data_name, vertices, relativeReadTime, values);
 }
 
+// User Profiling
+
+void Participant::start_profiling_section(::rust::Str section_name)
+{
+  participant->startProfilingSection(section_name);
+}
+
+void Participant::stop_last_profiling_section()
+{
+  participant->stopLastProfilingSection();
+}
+
 // experimental: Direct Access
 
 void Participant::set_mesh_access_region(::rust::Str mesh_name, ::rust::Slice<const double> boundingBox)
