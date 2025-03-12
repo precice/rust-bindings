@@ -69,6 +69,10 @@ bool Participant::requires_mesh_connectivity_for(::rust::Str mesh_name) const
 {
   return participant->requiresMeshConnectivityFor(mesh_name);
 }
+void Participant::reset_mesh(::rust::Str mesh_name)
+{
+  return participant->resetMesh(mesh_name);
+}
 vid Participant::set_mesh_vertex(::rust::Str mesh_name, ::rust::Slice<const double> position)
 {
   return participant->setMeshVertex(mesh_name, position);

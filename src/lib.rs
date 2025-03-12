@@ -31,6 +31,7 @@ mod ffi {
         // Mesh Access
 
         fn requires_mesh_connectivity_for(self: &Participant, mesh_name: &str) -> Result<bool>;
+        fn reset_mesh(self: Pin<&mut Participant>, mesh_name: &str) -> Result<()>;
         fn set_mesh_vertex(
             self: Pin<&mut Participant>,
             mesh_name: &str,
@@ -207,6 +208,9 @@ impl Participant {
 
     pub fn requires_mesh_connectivity_for(&self, mesh_name: &str) -> Result<bool, Error> {
         self.internal.requires_mesh_connectivity_for(mesh_name)
+    }
+    pub fn reset_mesh(&mut self, mesh_name: &str) -> Result<(), Error> {
+        self.internal.pin_mut().reset_mesh(mesh_name)
     }
     pub fn set_mesh_vertex(
         &mut self,

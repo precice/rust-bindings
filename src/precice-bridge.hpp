@@ -40,6 +40,7 @@ public:
   // Mesh Access
 
   bool requires_mesh_connectivity_for(::rust::Str mesh_name) const;
+  void reset_mesh(::rust::Str mesh_name);
   int  set_mesh_vertex(::rust::Str mesh_name, ::rust::Slice<const double> position);
   int  get_mesh_vertex_size(::rust::Str mesh_name) const;
   void set_mesh_vertices(::rust::Str mesh_name, ::rust::Slice<const double> positions, ::rust::Slice<vid> ids);
