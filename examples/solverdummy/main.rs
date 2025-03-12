@@ -67,7 +67,9 @@ fn main() -> Result<ExitCode, precice::Error> {
         let dt = participant.get_max_time_step_size()?;
         participant.read_data(mesh_name, read_data_name, &vertex_ids, dt, &mut read_data)?;
 
+        participant.start_profiling_section("solve")?;
         write_data = read_data.iter().map(|x| x + 1_f64).collect();
+        participant.stop_last_profiling_section()?;
 
         participant.write_data(mesh_name, write_data_name, &vertex_ids, &write_data)?;
 
