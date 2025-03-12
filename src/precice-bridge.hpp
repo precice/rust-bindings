@@ -58,6 +58,11 @@ public:
   void write_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> vertices, ::rust::Slice<const double> values);
   void read_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> vertices, double relativeReadTime, ::rust::Slice<double> values) const;
 
+  // User Profiling
+
+  void start_profiling_section(::rust::Str section_name);
+  void stop_last_profiling_section();
+
   // experimental: Direct Access
 
   void set_mesh_access_region(const ::rust::Str mesh_name, ::rust::Slice<const double> boundingBox);
