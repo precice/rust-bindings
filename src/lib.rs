@@ -151,6 +151,25 @@ mod ffi {
             vertices: &[i32],
             gradients: &[f64],
         ) -> Result<()>;
+
+        // experimental: JIT mapping
+
+        fn write_and_map_data(
+            self: Pin<&mut Participant>,
+            mesh_name: &str,
+            data_name: &str,
+            coordinates: &[f64],
+            values: &[f64],
+        ) -> Result<()>;
+
+        fn map_and_read_data(
+            self: &Participant,
+            mesh_name: &str,
+            data_name: &str,
+            coordinates: &[f64],
+            relative_read_dt: f64,
+            values: &mut [f64],
+        ) -> Result<()>;
     }
 }
 
@@ -395,5 +414,31 @@ impl Participant {
         self.internal
             .pin_mut()
             .write_gradient_data(mesh_name, data_name, vertices, gradients)
+    }
+
+    // experimental: JIT mapping
+
+    pub fn write_and_map_data(
+        &mut self,
+        mesh_name: &str,
+        data_name: &str,
+        coordinates: &[f64],
+        values: &[f64],
+    ) -> Result<(), Error> {
+        self.internal
+            .pin_mut()
+            .write_and_map_data(mesh_name, data_name, coordinates, values)
+    }
+
+    pub fn map_and_read_data(
+        &self,
+        mesh_name: &str,
+        data_name: &str,
+        coordinates: &[f64],
+        relative_read_dt: f64,
+        values: &mut [f64],
+    ) -> Result<(), Error> {
+        self.internal
+            .map_and_read_data(mesh_name, data_name, coordinates, relative_read_dt, values)
     }
 }
