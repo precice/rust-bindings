@@ -74,6 +74,9 @@ public:
   bool requires_gradient_data_for(::rust::Str mesh_name, ::rust::Str data_name) const;
   void write_gradient_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const vid> vertices, ::rust::Slice<const double> gradients);
 
+  void map_and_read_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const double> coordinates, double relativeReadTime, ::rust::Slice<double> values) const;
+  void write_and_map_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const double> coordinates, ::rust::Slice<const double> values);
+
 private:
   std::unique_ptr<::precice::Participant> participant;
 };

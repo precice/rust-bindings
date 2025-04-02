@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+## 3.2.0
+
+- Added support for `precice::Error` to most functions, now returning `Result<>`
+- Added bindings for all new methods of preCICE version 3.2.0
+
 ## 3.0.1
 
 - Fix compatibility with the latest rust 1.73 which ships with Ubuntu 22.04 LTS

@@ -169,6 +169,16 @@ void Participant::write_gradient_data(::rust::Str mesh_name, ::rust::Str data_na
   participant->writeGradientData(mesh_name, data_name, vertices, gradients);
 }
 
+void Participant::map_and_read_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const double> coordinates, double relativeReadTime, ::rust::Slice<double> values) const
+{
+  participant->mapAndReadData(mesh_name, data_name, coordinates, relativeReadTime, values);
+}
+
+void Participant::write_and_map_data(::rust::Str mesh_name, ::rust::Str data_name, ::rust::Slice<const double> coordinates, ::rust::Slice<const double> values)
+{
+  participant->writeAndMapData(mesh_name, data_name, coordinates, values);
+}
+
 std::unique_ptr<::precice::rust::Participant> create_participant(::rust::Str participant, ::rust::Str config, rint rank, rint size)
 {
   return std::make_unique<::precice::rust::Participant>(participant, config, rank, size);
