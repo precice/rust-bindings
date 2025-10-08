@@ -35,7 +35,9 @@ jobs:
       - name: Update APT
         run: apt-get -yy update && apt-get -yy upgrade
       - name: Install Cargo
-        run: apt-get -yy install cargo
+        run: apt-get -yy install rustup
+      - name: Install stable toolchain
+        run: rustup default stable
       - uses: actions/checkout@v4
       - name: Build bindings
         run: cargo build $CARGOFLAG 
