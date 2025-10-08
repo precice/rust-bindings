@@ -21,7 +21,9 @@ jobs:
         run: |
           apt-get -yy update
           apt-get -yy upgrade
-          apt-get -yy install cargo
+          apt-get -yy install rustup
+      - name: Install stable toolchain
+        run: rustup default stable
       - name: Install preCICE
         run: |
           # 2.5.4 -> 2.5.0 (always picks minor version 0 of precice)
