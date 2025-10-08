@@ -10,7 +10,7 @@ jobs:
   crates:
     name: 'Upload to crates.io'
     runs-on: ubuntu-latest
-    container: 'precice/ci-ubuntu-2204:latest'
+    container: 'precice/ci-ubuntu-2404:latest'
     steps:
       - name: Get verison from tag
         id: tag
