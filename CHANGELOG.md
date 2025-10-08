@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+## 3.3.0
+
+- Use stable toolchain in CI
+
 ## 3.2.0
 
 - Added support for `precice::Error` to most functions, now returning `Result<>`
