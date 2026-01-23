@@ -1,8 +1,18 @@
 extern crate pkg_config;
 extern crate semver;
+use std::env;
+
 use semver::Version;
 
 fn main() {
+    println!("cargo:rerun-if-env-changed=DOCS_RS");
+    if env::var("DOCS_RS").is_ok() {
+        println!("cargo:warning=Skipping build.rs when building for docs.rs");
+        println!("cargo::rustc-cfg=docsrs");
+        println!("cargo:rustc-check-cfg=cfg(docsrs)");
+        return;
+    }
+
     // Rebuild when the bridge files change
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/precice-bridge.cpp");
