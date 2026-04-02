@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+## 3.4.0
+
+- Update pre-commit hooks to latest version
+
 ## 3.3.1
 
 - Fix builing documentation without a preCICE installation on docs.rs
