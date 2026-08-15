@@ -1,0 +1,13 @@
+name: System tests
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  run-system-tests:
+    if: ${{ github.event.label.name == 'trigger-system-tests' }}
+    uses: precice/tutorials/.github/workflows/system-tests.yml@develop
+    with:
+      suites: rust-bindings
+      build_args: RUST_BINDINGS_PR:${{ github.event.number }},RUST_BINDINGS_REF:${{ github.event.pull_request.head.sha }}
