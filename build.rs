@@ -22,7 +22,7 @@ fn main() {
     let version = Version::parse(env!("CARGO_PKG_VERSION")).expect("Unable to parse crate version");
     let (major, minor) = (version.major, version.minor);
     let lower: &str = &format!("{major}.{minor}");
-    let upper: &str = &format!("{major}.{}", minor + 1);
+    let upper: &str = &format!("{}", major + 1);
 
     // Get version from the precice crate
     let precice = pkg_config::Config::new()
