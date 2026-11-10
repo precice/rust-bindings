@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+- Fix compatibility range to "until next major", required for supporting new API functions.
+
 ## 3.4.0
 
 - Update pre-commit hooks to latest version
