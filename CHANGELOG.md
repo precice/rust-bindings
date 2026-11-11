@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ## latest
 
+## 3.4.1
+
 - Fix compatibility range to "until next major", required for supporting new API functions.
 
 ## 3.4.0
